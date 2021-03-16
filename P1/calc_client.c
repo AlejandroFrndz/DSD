@@ -7,10 +7,9 @@
 #include "calc.h"
 
 
-void calcprog_1(char *host, double a, char op, double b)
+void calcprog_1(char *host, double a, char op, double b, double * result)
 {
 	CLIENT *clnt;
-	double  *result;
 
 	#ifndef	DEBUG
 		clnt = clnt_create (host, CALCPROG, CALCVER, "tcp");
@@ -23,7 +22,7 @@ void calcprog_1(char *host, double a, char op, double b)
 	switch (op)
 	{
 		case '+':
-			result = add_1(a,b,clnt);
+			*result = *add_1(a,b,clnt);
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
 			}
@@ -33,7 +32,7 @@ void calcprog_1(char *host, double a, char op, double b)
 		break;
 
 		case '-':
-			result = sub_1(a,b,clnt);
+			*result = *sub_1(a,b,clnt);
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
 			}
@@ -43,7 +42,7 @@ void calcprog_1(char *host, double a, char op, double b)
 		break;
 
 		case 'x':
-			result = mul_1(a,b,clnt);
+			*result = *mul_1(a,b,clnt);
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
 			}
@@ -56,7 +55,7 @@ void calcprog_1(char *host, double a, char op, double b)
 			if(b == 0){
 				printf("AVISO: Estas dividiendo por 0\n");
 			}
-			result = div_1(a,b,clnt);
+			*result = *div_1(a,b,clnt);
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
 			}
@@ -73,6 +72,7 @@ void calcprog_1(char *host, double a, char op, double b)
 	#ifndef	DEBUG
 		clnt_destroy (clnt);
 	#endif	 /* DEBUG */
+
 }
 
 
@@ -81,30 +81,48 @@ int main (int argc, char *argv[])
 	char *host;
 
 	if (argc < 5){
-		printf("Uso: <host> <número> <operación> <número>\n");
+		printf("Uso: <host> <número> <operación> <número> <operación> <número> ...\n");
 		exit(-1);
 	}
-
-	double num1, num2;
-	char op;
-	char * end;
-
-	num1 = strtod(argv[2], &end);
-	if(*end != '\0'){
-		printf("El primer operando introducido no es un número\n");
+	else if (argc % 2 != 1){
+		printf("Uso: <host> <número> <operación> <número> <operación> <número> ...\n");
 		exit(-1);
 	}
-
-	num2 = strtod(argv[4], &end);
-	if(*end != '\0'){
-		printf("El segundo operando introducido no es un número\n");
-		exit(-1);
-	}
-
-	op = argv[3][0];
 
 	host = argv[1];
 
-	calcprog_1(host,num1,op,num2);
+	int size = (argc-2)/2;
+	char * end;
+
+	double operands[size+1];
+	char operators[size];
+	double result;
+
+	int j = 0;
+
+	for(int i = 2; i < argc-1; i+=2){
+		operands[j] = strtod(argv[i], &end);
+		if(*end != '\0'){
+			printf("Alguno de los operandos introducidos no es un número\n");
+			exit(-1);
+		}
+		operators[j] = argv[i+1][0];
+		j++;
+	}
+	operands[size] = strtod(argv[argc-1], &end);
+	if(*end != '\0'){
+		printf("Alguno de los operandos introducidos no es un número\n");
+		exit(-1);
+	}
+
+	
+	calcprog_1(host,operands[0],operators[0],operands[1],&result);
+
+	for(int i = 1; i < size; i++){
+		calcprog_1(host,result,operators[i],operands[i+1],&result);
+	}
+
+	printf("%f\n", result);
+
 	exit (0);
 }
