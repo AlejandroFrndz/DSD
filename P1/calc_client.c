@@ -75,23 +75,11 @@ void calcprog_1(char *host, double a, char op, double b, double * result)
 
 }
 
-
-int main (int argc, char *argv[])
-{
+void numberMode(int argc, char *argv[]){
 	char *host;
-
-	if (argc < 5){
-		printf("Uso: <host> <número> <operación> <número> <operación> <número> ...\n");
-		exit(-1);
-	}
-	else if (argc % 2 != 1){
-		printf("Uso: <host> <número> <operación> <número> <operación> <número> ...\n");
-		exit(-1);
-	}
-
 	host = argv[1];
 
-	int size = (argc-2)/2;
+	int size = (argc-3)/2;
 	char * end;
 
 	double operands[size+1];
@@ -100,7 +88,7 @@ int main (int argc, char *argv[])
 
 	int j = 0;
 
-	for(int i = 2; i < argc-1; i+=2){
+	for(int i = 3; i < argc-1; i+=2){
 		operands[j] = strtod(argv[i], &end);
 		if(*end != '\0'){
 			printf("Alguno de los operandos introducidos no es un número\n");
@@ -115,7 +103,6 @@ int main (int argc, char *argv[])
 		exit(-1);
 	}
 
-	
 	calcprog_1(host,operands[0],operators[0],operands[1],&result);
 
 	for(int i = 1; i < size; i++){
@@ -123,6 +110,28 @@ int main (int argc, char *argv[])
 	}
 
 	printf("%f\n", result);
+}
+
+int main (int argc, char *argv[])
+{
+	if(argc > 2 && argv[2][0] == 'n'){
+		if (argc < 5){
+			printf("Uso: <host> <modo> <número> <operación> <número> <operación> <número> ...\n");
+			exit(-1);
+		}
+		else if (argc % 2 != 0){
+			printf("Uso: <host> <modo> <número> <operación> <número> <operación> <número> ...\n");
+			exit(-1);
+		}
+		numberMode(argc,argv);
+	}
+	else if(argc > 2 && argv[2][0] == 'v'){
+		printf("Stay tuned for vectorial operations\n");
+	}
+	else{
+		printf("Uso: <host> <modo> <parametros>\n");
+	}
 
 	exit (0);
 }
+
