@@ -5,6 +5,7 @@
  */
 
 #include "calc.h"
+#include <ctype.h>
 
 
 void calcprog_1(char *host, double a, char op, double b, double * result)
@@ -26,9 +27,6 @@ void calcprog_1(char *host, double a, char op, double b, double * result)
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
 			}
-			else{
-				printf("El resultado de la suma es: %f\n", *result);
-			}
 		break;
 
 		case '-':
@@ -36,18 +34,12 @@ void calcprog_1(char *host, double a, char op, double b, double * result)
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
 			}
-			else{
-				printf("El resultado de la resta es: %f\n", *result);
-			}
 		break;
 
 		case 'x':
 			*result = *mul_1(a,b,clnt);
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
-			}
-			else{
-				printf("El resultado de la multiplicación es: %f\n", *result);
 			}
 		break;
 
@@ -58,9 +50,6 @@ void calcprog_1(char *host, double a, char op, double b, double * result)
 			*result = *div_1(a,b,clnt);
 			if(result == (double *) NULL){
 				clnt_perror (clnt, "call failed");
-			}
-			else{
-				printf("El resultado de la división es: %f\n", *result);
 			}
 		break;
 		
@@ -73,6 +62,73 @@ void calcprog_1(char *host, double a, char op, double b, double * result)
 		clnt_destroy (clnt);
 	#endif	 /* DEBUG */
 
+}
+
+void calcprog_2(char * host, t_vec a, t_vec b, double c, char op){
+	CLIENT *clnt;
+	double * e;
+	t_vec * result;
+
+	#ifndef	DEBUG
+		clnt = clnt_create (host, CALCPROG, CALCVER, "tcp");
+		if (clnt == NULL) {
+			clnt_pcreateerror (host);
+			exit (1);
+		}
+	#endif	/* DEBUG */
+
+	switch (op)
+	{
+		case '1':
+			result = addv_1(a,b,clnt);
+			if(result == (t_vec *) NULL){
+				clnt_perror (clnt, "call failed");
+			}
+		break;
+
+		case '2':
+			result = subv_1(a,b,clnt);
+			if(result == (t_vec *) NULL){
+				clnt_perror (clnt, "call failed");
+			}
+		break;
+		
+		case '3':
+			e = dot_1(a,b,clnt);
+			if(e == (double *) NULL){
+				clnt_perror (clnt, "call failed");
+			}
+		break;
+
+		case '4':
+			result = cross_1(a,b,clnt);
+			if(result == (t_vec *) NULL){
+				clnt_perror (clnt, "call failed");
+			}
+		break;
+
+		case '5':
+			result = mulv_1(a,c,clnt);
+			if(result == (t_vec *) NULL){
+				clnt_perror (clnt, "call failed");
+			}
+		break;
+	}
+
+	if(op == '3'){
+		printf("El resultado de la operación es: %f\n", *e);
+	}
+	else{
+		printf("El vector resultado es: (");
+		for(int i = 0; i < 3; i++){
+			printf("%f ",result->t_vec_val[i]);
+		}
+		printf(")\n");
+	}
+
+	#ifndef	DEBUG
+		clnt_destroy (clnt);
+	#endif	 /* DEBUG */
 }
 
 void numberMode(int argc, char *argv[]){
@@ -109,7 +165,80 @@ void numberMode(int argc, char *argv[]){
 		calcprog_1(host,result,operators[i],operands[i+1],&result);
 	}
 
-	printf("%f\n", result);
+	printf("Resultado de la operación: %f\n", result);
+}
+
+t_vec readVector(){
+	t_vec vector;
+	vector.t_vec_len = 3;
+	vector.t_vec_val = (double *)malloc(3*sizeof(double));
+
+	char elements[10];
+	double ele;
+	int reads = 0;
+	do{
+		fgets(elements,10,stdin);
+		if(sscanf(elements,"%lf",&ele) == 0){
+			printf("El elemento introducido no es un número válido\n");
+		}
+		else{
+			vector.t_vec_val[reads] = ele;
+			reads++;
+		}
+	}while(reads < 3);
+
+	return vector;
+}
+
+void vectorMode(char * host){
+	printf("Selecciona la operación a realizar:\n1-Sumar\n2-Restar\n3-Producto Escalar\n4-Producto Vectorial\n5-Producto por un escalar\n");
+	char option[3];
+	t_vec vecA, vecB;
+	double e;
+	int valid = 0;
+
+	while(!valid){
+		valid = 1;
+		fgets(option,3,stdin);
+		switch (option[0])
+		{
+			case '1':
+
+			case '2':
+
+			case '3':
+
+			case '4':
+				printf("Introduce los elementos del primer vector\n");
+				vecA = readVector();
+				printf("Introduce los elementos del segundo vector\n");
+				vecB = readVector();
+			break;
+
+			case '5':
+				printf("Introduce los elementos del vector\n");
+				vecA = readVector();
+				printf("Introduce el escalar\n");
+				char elements[10];
+				while(1){
+					fgets(elements,10,stdin);
+					if(sscanf(elements,"%lf",&e) == 0){
+						printf("El elemento introducido no es un número válido\n");
+					}
+					else{
+						break;
+					}
+				}
+			break;
+			
+			default:
+				printf("Opción inválida\n");
+				valid = 0;
+			break;
+		}
+	}
+
+	calcprog_2(host, vecA, vecB, e, option[0]);
 }
 
 int main (int argc, char *argv[])
@@ -126,7 +255,9 @@ int main (int argc, char *argv[])
 		numberMode(argc,argv);
 	}
 	else if(argc > 2 && argv[2][0] == 'v'){
-		printf("Stay tuned for vectorial operations\n");
+		char * host;
+		host = argv[1];
+		vectorMode(host);
 	}
 	else{
 		printf("Uso: <host> <modo> <parametros>\n");
@@ -134,4 +265,3 @@ int main (int argc, char *argv[])
 
 	exit (0);
 }
-
