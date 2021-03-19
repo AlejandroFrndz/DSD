@@ -120,10 +120,10 @@ void calcprog_2(char * host, t_vec a, t_vec b, double c, char op){
 	}
 	else{
 		printf("El vector resultado es: (");
-		for(int i = 0; i < 3; i++){
-			printf("%f ",result->t_vec_val[i]);
+		for(int i = 0; i < 2; i++){
+			printf("%f,",result->t_vec_val[i]);
 		}
-		printf(")\n");
+		printf("%f)\n",result->t_vec_val[2]);
 	}
 
 	#ifndef	DEBUG

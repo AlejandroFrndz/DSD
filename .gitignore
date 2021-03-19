@@ -1,4 +1,4 @@
-P1/*
-!P1/calc_client.c
-!P1/calc_server.c
-!P1/calc.x
+P2/*
+!P2/calc_client.c
+!P2/calc_server.c
+!P2/calc.x
