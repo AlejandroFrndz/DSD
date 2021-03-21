@@ -6,6 +6,7 @@
 
 #include "calc.h"
 
+//Suma
 double * add_1_svc(double a, double b,  struct svc_req *rqstp)
 {
 	static double  result;
@@ -15,6 +16,7 @@ double * add_1_svc(double a, double b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Resta
 double * sub_1_svc(double a, double b,  struct svc_req *rqstp)
 {
 	static double  result;
@@ -24,6 +26,7 @@ double * sub_1_svc(double a, double b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Multiplicación
 double * mul_1_svc(double a, double b,  struct svc_req *rqstp)
 {
 	static double  result;
@@ -33,6 +36,7 @@ double * mul_1_svc(double a, double b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//División
 double * div_1_svc(double a, double b,  struct svc_req *rqstp)
 {
 	static double  result;
@@ -42,6 +46,7 @@ double * div_1_svc(double a, double b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Suma Vectores
 t_vec * addv_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 {
 	static t_vec  result;
@@ -55,6 +60,7 @@ t_vec * addv_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Resta Vectores
 t_vec * subv_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 {
 	static t_vec  result;
@@ -68,9 +74,12 @@ t_vec * subv_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Producto Escalar
 double * dot_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 {
 	static double  result;
+
+	result = 0;
 
 	for(int i = 0; i < 3; i++){
 		result += a.t_vec_val[i] * b.t_vec_val[i];
@@ -79,6 +88,7 @@ double * dot_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Producto Vectorial
 t_vec * cross_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 {
 	static t_vec  result;
@@ -93,6 +103,7 @@ t_vec * cross_1_svc(t_vec a, t_vec b,  struct svc_req *rqstp)
 	return &result;
 }
 
+//Producto por un Escalar
 t_vec * mulv_1_svc(t_vec a, double b,  struct svc_req *rqstp)
 {
 	static t_vec  result;
