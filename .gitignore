@@ -2,3 +2,7 @@ P2/*
 !P2/calc_client.c
 !P2/calc_server.c
 !P2/calc.x
+P2-Thrift/*
+!P2-Thrift/calculadora.thrift
+!P2-Thrift/server.rb
+!P2-Thrift/cliente.py
