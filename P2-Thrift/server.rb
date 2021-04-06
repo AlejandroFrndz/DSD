@@ -3,7 +3,7 @@ require_relative 'calculadora'
 
 class Handler
     def ping()
-        puts "Me han pingeado"
+        print "Me han pingeado"
     end
 
     def suma(a,b)
@@ -34,7 +34,7 @@ end
 
 handler = Handler.new()
 processor = Calculadora::Processor.new(handler)
-transport = Thrift::ServerSocket.new(9090)
+transport = Thrift::ServerSocket.new(9091)
 transportFactory = Thrift::BufferedTransportFactory.new()
 server = Thrift::SimpleServer.new(processor, transport, transportFactory)
 

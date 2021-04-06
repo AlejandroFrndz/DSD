@@ -13,7 +13,7 @@ client = Calculadora.Client(protocol)
 
 transport.open()
 
-print("hacemos ping al server")
+print("Hacemos ping al server")
 client.ping()
 
 resultado = client.suma(2.5, 2.5)
