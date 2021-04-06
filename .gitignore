@@ -6,3 +6,4 @@ P2-Thrift/*
 !P2-Thrift/calculadora.thrift
 !P2-Thrift/server.rb
 !P2-Thrift/cliente.py
+!P2-Thrift/server.py
