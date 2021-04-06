@@ -3,7 +3,7 @@ require_relative 'calculadora'
 
 class Handler
     def ping()
-        print "Me han pingeado"
+        print "Me han pingeado\n"
     end
 
     def suma(a,b)
