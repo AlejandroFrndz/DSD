@@ -2,33 +2,19 @@ require 'thrift'
 require_relative 'calculadora'
 
 class Handler
-    def ping()
+    def pingServer()
         print "Me han pingeado\n"
+        return "Ruby Server OK"
     end
 
     def suma(a,b)
-        print "Sumando: ", a , " " , b , "\n"
+        print "Sumando: ", a , " + " , b , "\n"
         return a + b
     end
 
     def resta(a,b)
-        print "Restando: ", a , " " , b , "\n"
+        print "Restando: ", a , " - " , b , "\n"
         return a - b
-    end
-
-    def multiplica(a,b)
-        print "Multiplicando: ", a , " " , b , "\n"
-        return a * b
-    end
-
-    def divide(a,b)
-        if( b == 0)
-            e = OperacionInvalida.new()
-            e.mensaje = "No se puede dividir por 0"
-            raise e 
-        end
-        print "Dividiendo: ", a , " " , b , "\n"
-        return a / b
     end
 end
 

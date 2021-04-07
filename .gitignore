@@ -4,7 +4,7 @@ P2/*
 !P2/calc.x
 P2-Thrift/*
 !P2-Thrift/calculadora.thrift
-!P2-Thrift/cliente.rb
+!P2-Thrift/client.rb
 !P2-Thrift/server.rb
-!P2-Thrift/cliente.py
+!P2-Thrift/gateway.py
 !P2-Thrift/server.py
