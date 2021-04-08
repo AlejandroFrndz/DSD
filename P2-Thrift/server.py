@@ -20,7 +20,7 @@ class CalculadoraHandler:
 
     def divide(self, n1, n2):
         if n2 == 0:
-            raise Calculadora.OperacionInvalida("No puedes dividir por 0")
+            raise Calculadora.OperacionInvalida("No puedes dividir por 0") #Si se intenta dividir por 0, se levanta una excepcion antes de realizar ningun procesamiento en el servidor
 
         print("Dividiendo: " + str(n1) + " / " + str(n2))
         result = n1 / n2

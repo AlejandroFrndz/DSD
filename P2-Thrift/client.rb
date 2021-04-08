@@ -1,14 +1,16 @@
 require 'thrift'
-
 require_relative 'calculadora'
- 
+
+#Se encapsula toda la ejecución en un begin-rescue (try-catch de ruby) para detectar cualquier excepción relacionado con la comunicación de Thrift
 begin 
+    #Se crean los objetos necesarios para la comunicación como cliente
     transport = Thrift::BufferedTransport.new(Thrift::Socket.new('localhost', 9090))
     protocol = Thrift::BinaryProtocol.new(transport)
     client = Calculadora::Client.new(protocol)
  
     transport.open()
     
+    #Se realiza primeramente un ping a ambos servidores
     puts "Probando conexión a los servidores: "
     mensaje = client.ping(Server::RUBY)
     puts mensaje
@@ -16,11 +18,13 @@ begin
     mensaje = client.ping(Server::PYTHON)
     puts mensaje
 
+    #Se crea la estructura necesaria para la comunicación con el gateway
     paquete = Paquete.new()
     
     begin
         puts "Introduzca la operación a realizar. Las disponibles son: ", "  -Sumar (s)", "  -Restar (r)", "  -Multiplicar (m)", "  -Dividir (d)", "Escriba 'Quit', 'quit' o 'q' para salir"
 
+        #Se procesa la elección de las opciones disponibles
         begin
             valida = true
             salir = false
@@ -46,6 +50,7 @@ begin
             end
         end while !valida
 
+        #Si se va a realizar una operación, se solicitan ambos operandos comprobando que sean correctos (números)
         if !salir
             puts "Introduzca el primer operando"
 
@@ -67,6 +72,7 @@ begin
                 retry
             end
 
+            #Se envía la operación al gateway para su procesamiento. Se encapsula en un bloque begin-rescue por si la división genera una excepción
             begin
                 puts ""
                 result = client.operar(paquete)
@@ -77,6 +83,7 @@ begin
         end
     end while !salir
 
+    #Cuando se sale, para finalizar se cierra la conexión
     transport.close()
  
 rescue Thrift::Exception => tx
