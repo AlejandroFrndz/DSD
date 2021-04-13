@@ -8,3 +8,4 @@ P2-Thrift/*
 !P2-Thrift/server.rb
 !P2-Thrift/gateway.py
 !P2-Thrift/server.py
+*.class
