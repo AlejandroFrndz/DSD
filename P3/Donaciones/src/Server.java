@@ -7,9 +7,25 @@ public class Server {
             System.setSecurityManager(new SecurityManager());
         }
 
+        String nombre, nombreReplica;
+
+        if(args.length < 1 || (!args[0].equals("1") && !args[0].equals("2"))){
+            System.out.println("Uso: <id>, siendo id 1 o 2");
+        }
+
+        if(args[0].equals("1")){
+            nombre = "gestor1";
+            nombreReplica = "gestor2";
+        }
+        else{
+            nombre = "gestor2";
+            nombreReplica = "gestor1";
+        }
+
+        
         try {
-            GestorCliente gestorCliente = new GestorCliente();
-            Naming.rebind("gestor",gestorCliente);
+            GestorCliente gestorCliente = new GestorCliente(nombre,nombreReplica);
+            Naming.rebind(nombre,gestorCliente);
             System.out.println("Servidor preparado");
         } catch (RemoteException | MalformedURLException e) {
             System.err.println("Remote Exception:");

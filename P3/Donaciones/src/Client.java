@@ -7,13 +7,14 @@ public class Client {
         String usuario = "";
         String nombre;
         String pass;
+        String nombreServer = "gestor1";
 
         if(System.getSecurityManager() == null){
             System.setSecurityManager(new SecurityManager());
         }
 
         try {
-            GestorClienteI gestor = (GestorClienteI)Naming.lookup("gestor");
+            GestorClienteI gestor = (GestorClienteI)Naming.lookup(nombreServer);
 
             boolean sesion = false;
 
@@ -43,8 +44,11 @@ public class Client {
                             pass = scanner.nextLine();
                         }
 
-                        if(gestor.registrarEntidad(nombre, pass)){
+                        nombreServer = gestor.registrarEntidad(nombre, pass);
+
+                        if(!nombreServer.equals("")){
                             usuario = nombre;
+                            gestor = (GestorClienteI)Naming.lookup(nombreServer);
                             sesion = true;
                             System.out.println("Su registro se ha completado. Bienvenido " + nombre);
                         }
@@ -69,8 +73,10 @@ public class Client {
                             pass = scanner.nextLine();
                         }
 
-                        if(gestor.inicarSesion(nombre, pass)){
+                        nombreServer = gestor.inicarSesion(nombre, pass);
+                        if(!nombreServer.equals("")){
                             usuario = nombre;
+                            gestor = (GestorClienteI)Naming.lookup(nombreServer);
                             sesion = true;
                             System.out.println("Bienvenido de nuevo " + nombre);
                         }
