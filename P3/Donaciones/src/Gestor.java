@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class GestorCliente extends UnicastRemoteObject implements GestorClienteI, GestorReplicaI{
+public class Gestor extends UnicastRemoteObject implements GestorClienteI, GestorReplicaI{
     private ArrayList<Entidad> entidades;
     private double subtotal;
     private GestorReplicaI replica;
@@ -12,7 +12,7 @@ public class GestorCliente extends UnicastRemoteObject implements GestorClienteI
     private String nombrePropio;
 
 
-    GestorCliente(String nombre, String replica) throws RemoteException{
+    Gestor(String nombre, String replica) throws RemoteException{
         this.entidades = new ArrayList<>();
         this.subtotal = 0;
         this.nombrePropio = nombre;
@@ -68,8 +68,7 @@ public class GestorCliente extends UnicastRemoteObject implements GestorClienteI
     //GestorCliente
     public String registrarEntidad(String nombre, String pass){
         setReplica();
-        
-        System.out.println("Se ha solicitado un registro con nombre: " + nombre + " y contraseña " + pass);
+
         String result = "";
         try {
             if(buscarEntidad(nombre) == null && replica.existeEntidad(nombre) == false){

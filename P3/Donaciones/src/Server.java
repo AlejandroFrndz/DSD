@@ -24,8 +24,8 @@ public class Server {
 
         
         try {
-            GestorCliente gestorCliente = new GestorCliente(nombre,nombreReplica);
-            Naming.rebind(nombre,gestorCliente);
+            Gestor gestor = new Gestor(nombre,nombreReplica);
+            Naming.rebind(nombre,gestor);
             System.out.println("Servidor preparado");
         } catch (RemoteException | MalformedURLException e) {
             System.err.println("Remote Exception:");
