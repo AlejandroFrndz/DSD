@@ -1,12 +1,15 @@
+import java.util.ArrayList;
 public class Entidad {
     private String nombre;
     private String pass;
     private double totalDonado;
+    ArrayList<ProyectosEnum> proyectos;
 
     Entidad(String nombre, String pass){
         this.nombre = nombre;
         this.pass = pass;
         this.totalDonado = 0;
+        this.proyectos = new ArrayList<>();
     }
 
     public String getNombre(){
@@ -23,5 +26,13 @@ public class Entidad {
 
     public void donar(double cantidad){
         this.totalDonado += cantidad;
+    }
+
+    public void addProyecto(ProyectosEnum proyecto){
+        proyectos.add(proyecto);
+    }
+
+    public ArrayList<ProyectosEnum> getProyectos(){
+        return proyectos;
     }
 }

@@ -1,8 +1,14 @@
 import java.rmi.*;
 import java.util.Scanner;
 
-public class Client {
+public class Client implements Runnable{
+    
     public static void main(String[] args){
+        new Thread(new Client()).start();
+    }
+
+    @Override
+    public void run(){
         Scanner scanner = new Scanner(System.in);
         String usuario = "";
         String nombre;
@@ -99,11 +105,13 @@ public class Client {
 
             boolean seguir = true;
 
+            System.out.println("Hola " + usuario + " Qué desea hacer");
             while(seguir){
-                System.out.println("Hola " + usuario + " Qué desea hacer");
                 System.out.println("1- Donar");
-                System.out.println("2- Consultar Total");
-                System.out.println("3- Salir");
+                System.out.println("2- Consultar Cuentas");
+                System.out.println("3- Ejecutar Proyecto");
+                System.out.println("4- Consultar Proyectos");
+                System.out.println("5- Salir");
 
                 int opcion = scanner.nextInt();
 
@@ -131,16 +139,81 @@ public class Client {
 
                     case 2:
                         double total = gestor.consultarTotal(usuario);
+                        double balance = gestor.consultarBalance(usuario);
 
                         if(total == -1){
                             System.out.println("Lo sentimos, pero usted debe realizar al menos 1 donación antes de poder consultar el total");
                         }
                         else{
-                            System.out.println("Hasta ahora hemos recaudado: " + total + " Gracias por su ayuda");
+                            System.out.println("Hasta ahora hemos recaudado: " + total + "€");
+                            System.out.println("Actualmente disponemos de " + balance + "€");
+                            System.out.println("Gracias por su ayuda");
                         }
                     break;
 
                     case 3:
+
+                        double disponible = gestor.consultarBalance(usuario);
+
+                        if(disponible == -1){
+                            System.out.println("Lo sentimos, pero usted debe realizar al menos 1 donación antes de poder ejecutar proyectos");
+                        }
+                        else{
+
+                            System.out.println("Los proyectos realizables son");
+                            System.out.println("1- Vivienda -- 20.000€");
+                            System.out.println("2- Escuela -- 100.000€");
+                            System.out.println("3- Hospital -- 500.000€");
+
+                            opcion = scanner.nextInt();
+                            scanner.nextLine();
+
+                            ProyectosEnum proyecto = null;
+                            double coste = 0;
+
+                            switch(opcion){
+                                case 1:
+                                    proyecto = ProyectosEnum.VIVIENDA;
+                                    coste = 20000;
+                                break;
+
+                                case 2:
+                                    proyecto = ProyectosEnum.ESCUELA;
+                                    coste = 100000;
+                                break;
+
+                                case 3:
+                                    proyecto = ProyectosEnum.HOSPITAL;
+                                    coste = 500000;
+                                break;
+
+                                default:
+                                    proyecto = null;
+                                break;
+                            }
+
+                            if(proyecto != null){
+                                if(disponible < coste){
+                                    System.out.println("Lo sentimos, pero actualmente solo disponemos de " + disponible + " €. No podemos permitirnos ese proyecto");
+                                }
+                                else{
+                                    gestor.ejecutarProyecto(proyecto, coste, usuario);
+                                }
+                            }
+                        }
+                    break;
+
+                    case 4:
+                        int[] proyectos = gestor.consultarProyectos();
+
+                        System.out.println("Hasta el momento hemos construido");
+                        System.out.println(proyectos[0] + " Viviendas");
+                        System.out.println(proyectos[1] + " Escuelas");
+                        System.out.println(proyectos[2] + " Hospitales");
+                        System.out.println("Gracias por su cooperación");
+                    break;
+
+                    case 5:
                         System.out.println("Esperamos verle de nuevo pronto");
                         seguir = false;
                     break;
