@@ -41,19 +41,19 @@ var httpServer = http.createServer(
 );
 
 
-MongoClient.connect("mongodb://localhost:27017/", function(err, db) {
+MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnifiedTopology:true}, function(err, db) {
 	httpServer.listen(8080);
 	//var io = socketio.listen(httpServer);
 	var io = new Server(httpServer);
 
 	var dbo = db.db("pruebaBaseDatos");
 	//Si la colección ya ha sido creada previamente, hay que usar dbo.collection o de lo contrario collection estará undefined y peta
-	dbo.createCollection("test", function(err, collection){
+	dbo.collection("test", function(err, collection){
     	io.sockets.on('connection',
 		function(client) {
 			client.emit('my-address', {host:client.request.connection.remoteAddress, port:client.request.connection.remotePort});
 			client.on('poner', function (data) {
-				collection.insert(data, {safe:true}, function(err, result) {});
+				collection.insertOne(data, {safe:true}, function(err, result) {});
 			});
 			client.on('obtener', function (data) {
 				collection.find(data).toArray(function(err, results){

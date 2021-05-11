@@ -2,8 +2,8 @@ var http = require("http");
 var url = require("url");
 var fs = require("fs");
 var path = require("path");
-//var socketio = require("socket.io"); Ejemplo Original. Para sorpresa de nadie no funciona
-const { Server } = require("socket.io");
+//var socketio = require("socket.io"); //Ejemplo Original.
+const { Server } = require("socket.io"); //Modificación
 var mimeTypes = { "html": "text/html", "jpeg": "image/jpeg", "jpg": "image/jpeg", "png": "image/png", "js": "text/javascript", "css": "text/css", "swf": "application/x-shockwave-flash"};
 
 var httpServer = http.createServer(
@@ -38,8 +38,8 @@ var httpServer = http.createServer(
 	}
 );
 httpServer.listen(8080);
-//var io = socketio.listen(httpServer);	Ejemplo Original. Para sorpresa de nadie no funciona
-var io = new Server(httpServer);
+//var io = socketio.listen(httpServer);	//Ejemplo Original.
+var io = new Server(httpServer); //Modificación
 
 var allClients = new Array();
 io.sockets.on('connection',
