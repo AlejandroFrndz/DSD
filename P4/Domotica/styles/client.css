@@ -1,0 +1,44 @@
+html{
+    font-family: "Roboto";
+}
+
+#titulo{
+    text-align: center;
+}
+
+.container{
+    border: 2px solid black;
+    border-radius: 20px;
+    background-color: #ddd;
+    padding-bottom: 20px;
+}
+
+.container h3{
+    text-align: center;
+}
+
+.medidasBox{
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    display: inline;
+}
+
+.imgContainer{
+    float:left;
+}
+
+#feedbackAire{
+    margin-left: 30px; 
+    text-align: center;
+    border-radius: 20px;
+    padding: 8px;
+}
+
+.frio{
+    background-color: lightblue;
+}
+
+.calor{
+    background-color: lightcoral;
+}

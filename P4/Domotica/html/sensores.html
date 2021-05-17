@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="author" content="Alejandrof" />
+        <title>Sensores</title>
+        <link rel="icon" href="/images/iot.png" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+        <link href="/styles/sensores.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <h1 id="titulo">Lecturas de los Sensores</h1>
+        <div id="formulario">
+            <form action="javascript:void(0);" onsubmit="enviarMedidas()">
+                <label for="temp">Temperatura: </label>
+                <input type="number" id="temp" name="temp" min="0" max="50" required><br>
+                <label for="luz">Luminosidad: </label>
+                <input type="number" id="luz" name="luz" min="0" max="100" required><br>
+                <button type="submit">Enviar Datos</button>
+            </form>
+        </div>
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+        function enviarMedidas(){
+            var temp = document.getElementById("temp").value;
+            var luz = document.getElementById("luz").value;
+            var timestamp = new Date();
+            timestamp = timestamp.toDateString() + " " + timestamp.toTimeString();
+            
+            var socket = io.connect("localhost:8080");
+            socket.emit("sendMedidas", {temp:temp, luz:luz, timestamp:timestamp});
+        }
+    </script>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="author" content="Alejandrof" />
+        <title>Interfaz Clientes</title>
+        <link rel="icon" href="images/iot.png" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+        <link href="styles/client.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <h1 id="titulo">Croodle Home</h1>
+
+        <div class="container">
+            <h3>Medidas Actuales</h3>
+
+            <p class="medidasBox">Temperatura: <span id="temperaturaMedida"></span> Cº</p>
+
+            <p class="medidasBox">Luminosidad: <span id="luminosidadMedida"></span> cd</p>
+        </div>
+        <br>
+        <div class="container" style="height: 350px;">
+            <h3>Actuadores</h3>
+
+            <div class="image123">
+                <figure class="imgContainer">
+                    <img src="/images/aire.jpg" height="200" width="200"/>
+                    <figcaption><button>Aire</button><span id="feedbackAire">Off</span></figcaption>
+                </figure>
+                <figure class="imgContainer">
+                    <img id="imgPersiana" height="200" width="200"/>
+                    <figcaption><button id="btnPersiana" onclick="actuarPersiana()"></button></figcaption>
+                </figure>
+            </div>
+        </div>
+        <br>
+        <div class="container">
+            <h3>Alertas</h3>
+            <p id="alertaTemp"></p>
+            <p id="alertaLuz"></p>
+            <p id="alertaActAire"></p>
+            <p id="alertaActPersiana"></p>
+            <p id="alertaDesconexion"></p>
+        </div>
+
+        <a href="/html/sensores.html" target="_blank">Acceso a los Sensores</a>
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+        var temperatura = document.getElementById("temperaturaMedida");
+        var luminosidad = document.getElementById("luminosidadMedida");
+
+        var socket = io.connect("localhost:8080");
+
+        socket.on("nuevasMedidas", function(datos){
+            temperatura.innerHTML = datos.temp;
+            luminosidad.innerHTML = datos.luz;
+        });
+
+        socket.on("heartbeat", function(){
+            var alerta = document.getElementById("alertaDesconexion");
+            alerta.innerHTML = "";
+        })
+
+        socket.on("disconnect", function(){
+            var alerta = document.getElementById("alertaDesconexion");
+            alerta.innerHTML = "Se ha perdido la conexión con el servidor. Los datos mostrados podrían no estar actualizados";
+        });
+
+        socket.on("cambiarPersiana", function(data){
+            var img = document.getElementById("imgPersiana");
+            var btn = document.getElementById("btnPersiana");
+
+            if(data.estado == "Down"){
+                img.setAttribute("src","/images/persianasDown.jpg");
+                btn.innerHTML = "Subir Persianas";
+            }
+            else{
+                img.setAttribute("src","/images/persianasUp.jpg");
+                btn.innerHTML = "Bajar Persianas";
+            }
+        })
+
+        function actuarPersiana(){
+            socket.emit("actuarPersiana");
+        }
+    </script>
+</html>
