@@ -28,7 +28,6 @@
             var temp = document.getElementById("temp").value;
             var luz = document.getElementById("luz").value;
             var timestamp = new Date();
-            timestamp = timestamp.toDateString() + " " + timestamp.toTimeString();
             
             var socket = io.connect("localhost:8080");
             socket.emit("sendMedidas", {temp:temp, luz:luz, timestamp:timestamp});

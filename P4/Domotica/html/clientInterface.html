@@ -26,7 +26,7 @@
             <div class="image123">
                 <figure class="imgContainer">
                     <img src="/images/aire.jpg" height="200" width="200"/>
-                    <figcaption><button>Aire</button><span id="feedbackAire">Off</span></figcaption>
+                    <figcaption><button id="btnAireOn/Off" onclick="actuarAire()"></button><button id="btnAireFrio/Calor" onclick="actuarModoAire()"></button></figcaption>
                 </figure>
                 <figure class="imgContainer">
                     <img id="imgPersiana" height="200" width="200"/>
@@ -39,12 +39,12 @@
             <h3>Alertas</h3>
             <p id="alertaTemp"></p>
             <p id="alertaLuz"></p>
-            <p id="alertaActAire"></p>
-            <p id="alertaActPersiana"></p>
+            <p id="alertaAire"></p>
+            <p id="alertaPersiana"></p>
             <p id="alertaDesconexion"></p>
         </div>
-
-        <a href="/html/sensores.html" target="_blank">Acceso a los Sensores</a>
+        <br>
+        <a class="btn" href="/html/sensores.html" target="_blank">Acceso a los Sensores</a>
     </body>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -57,12 +57,9 @@
         socket.on("nuevasMedidas", function(datos){
             temperatura.innerHTML = datos.temp;
             luminosidad.innerHTML = datos.luz;
-        });
-
-        socket.on("heartbeat", function(){
             var alerta = document.getElementById("alertaDesconexion");
             alerta.innerHTML = "";
-        })
+        });
 
         socket.on("disconnect", function(){
             var alerta = document.getElementById("alertaDesconexion");
@@ -81,10 +78,71 @@
                 img.setAttribute("src","/images/persianasUp.jpg");
                 btn.innerHTML = "Bajar Persianas";
             }
-        })
+        });
+
+        socket.on("powerAire", function(data){
+            var btnPower = document.getElementById("btnAireOn/Off");
+            var btnModo = document.getElementById("btnAireFrio/Calor");
+
+            if(data.estado == "OFF"){
+                btnPower.innerHTML = "Encender";
+                btnModo.innerHTML = "OFF";
+                btnModo.onclick = null;
+                btnModo.style.backgroundColor = "initial";
+            }
+            else{
+                btnPower.innerHTML = "Apagar";
+                btnModo.onclick = actuarModoAire;
+
+                if(data.modo == "Frio"){
+                    btnModo.innerHTML = "Frio";
+                    btnModo.style.backgroundColor = "#add8e6";
+                }
+                else{
+                    btnModo.innerHTML = "Calor";
+                    btnModo.style.backgroundColor = "#f08080";
+                }
+            }
+        });
+
+        socket.on("modoAire", function(data){
+            var btnModo = document.getElementById("btnAireFrio/Calor");
+            if(data.modo == "Frio"){
+                btnModo.innerHTML = "Frio";
+                btnModo.style.backgroundColor = "#add8e6";
+            }
+            else{
+                btnModo.innerHTML = "Calor";
+                btnModo.style.backgroundColor = "#f08080";
+            }
+        });
+
+        socket.on("alertaTemp", function(data){
+            document.getElementById("alertaTemp").innerHTML = data.msg;
+        });
+
+        socket.on("alertaLuz", function(data){
+            document.getElementById("alertaLuz").innerHTML = data.msg;
+        });
+
+        socket.on("alertaPersiana", function(data){
+            document.getElementById("alertaPersiana").innerHTML = data.msg;
+        });
+
+        socket.on("alertaAire", function(data){
+            document.getElementById("alertaAire").innerHTML = data.msg;
+        });
 
         function actuarPersiana(){
             socket.emit("actuarPersiana");
+        }
+
+        function actuarAire(){
+            socket.emit("actuarAire");
+        }
+
+        function actuarModoAire(){
+            socket.emit("actuarModoAire");
         }
     </script>
 </html>
