@@ -9,3 +9,4 @@ P2-Thrift/*
 !P2-Thrift/gateway.py
 !P2-Thrift/server.py
 *.class
+P4/Domotica/bot.txt

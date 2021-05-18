@@ -16,7 +16,9 @@
                 <label for="temp">Temperatura: </label>
                 <input type="number" id="temp" name="temp" min="0" max="50" required><br>
                 <label for="luz">Luminosidad: </label>
-                <input type="number" id="luz" name="luz" min="0" max="100" required><br>
+                <input type="number" id="luz" name="luz" min="50" max="150" required><br>
+                <label for="wind">Viento: </label>
+                <input type="number" id="wind" name="wind" min="20" max="100" required><br>
                 <button type="submit">Enviar Datos</button>
             </form>
         </div>
@@ -24,13 +26,87 @@
 
     <script src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript">
+        var socket = io.connect("localhost:8080");
+        var toldo = "Cerrado";
+        var persianas = "Down";
+        var aire = "OFF";
+        var modoAire = "Frio";
+        var temp;
+        var luz;
+        var wind;
+
+        socket.on("powerAire",function(data){
+            aire = data.estado;
+            modoAire = data.modo;
+        });
+
+        socket.on("modoAire", function(data){
+            modoAire = data.modo;
+        });
+
+        socket.on("nuevasMedidas", function(data){
+            temp = parseInt(data.temp);
+            luz = parseInt(data.luz);
+            wind = parseInt(data.wind);
+        });
+
+        socket.on("cambiarPersiana", function(data){
+            if(data.estado != persianas){
+                if(data.estado == "Down"){
+                    luz -= 40;
+                }
+                else{
+                    luz += 40;
+                }
+                persianas = data.estado;
+
+                var timestamp = new Date();
+                socket.emit("sendMedidas", {temp:temp, luz:luz, wind:wind, timestamp:timestamp});
+            }
+        });
+
+        socket.on("cambiarToldo", function(data){
+            if(data.estado != toldo){
+                if(data.estado == "Cerrado"){
+                    luz += 10;
+                }
+                else{
+                    luz -= 10;
+                }
+                toldo = data.estado;
+
+                var timestamp = new Date();
+                socket.emit("sendMedidas", {temp:temp, luz:luz, wind:wind, timestamp:timestamp});
+            }
+        })
+
         function enviarMedidas(){
-            var temp = document.getElementById("temp").value;
-            var luz = document.getElementById("luz").value;
+            var tempForm = document.getElementById("temp").value;
+            var luzForm = document.getElementById("luz").value;
+            var windForm = document.getElementById("wind").value;
             var timestamp = new Date();
             
-            var socket = io.connect("localhost:8080");
-            socket.emit("sendMedidas", {temp:temp, luz:luz, timestamp:timestamp});
+            socket.emit("sendMedidas", {temp:tempForm, luz:luzForm, wind:windForm, timestamp:timestamp});
         }
+
+        function temperatureSimulator(){
+            if(aire == "ON"){
+                if(modoAire == "Frio"){
+                    temp--;
+                }
+                else{
+                    temp++;
+                }
+                
+                var timestamp = new Date();
+
+                socket.emit("sendMedidas", {temp:temp, luz:luz, wind:wind, timestamp:timestamp});
+            }
+        }
+
+        setInterval(temperatureSimulator,5000);
+
+
+
     </script>
 </html>

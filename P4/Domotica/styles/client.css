@@ -2,8 +2,24 @@ html{
     font-family: "Roboto";
 }
 
+#logoTas{
+    display: inline;
+}
+
 #titulo{
-    text-align: center;
+    position: relative;
+    left: 550px;
+    bottom: 30px;
+    display: inline;
+}
+
+.exponente{
+    vertical-align: super;
+    font-size: 0.5em;
+}
+
+.top{
+    margin-top: 30px;
 }
 
 .container{
@@ -11,6 +27,7 @@ html{
     border-radius: 20px;
     background-color: #ddd;
     padding-bottom: 20px;
+    padding-left: 20px;
 }
 
 .container h3{
@@ -35,9 +52,13 @@ html{
     padding: 8px;
 }
 
+#btnToldo{
+    margin-left: 50px;
+}
+
 .btn {
     display: inline-block;
-    background-color: #3688f4;
+    background-color: #c41c56;
     color: #FFFFFF;
     padding: 14px 25px;
     text-align: center;
@@ -48,5 +69,24 @@ html{
 }
 
 .btn:hover{
-    background-color: #006eff;
+    background-color: #c30044;
+}
+
+.alerta{
+    display: none;
+    background-color: #b60b22;
+    border-radius: 40px;
+    padding: 0.5%;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 30px;
+    width: 50%;
+    margin-left: 25%;
+}
+
+.btnControl{
+    margin-left: 10px;
+    vertical-align: middle;
+
 }

@@ -6,18 +6,22 @@
         <title>Interfaz Clientes</title>
         <link rel="icon" href="images/iot.png" />
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link href="styles/client.css" rel="stylesheet" />
     </head>
 
     <body>
-        <h1 id="titulo">Croodle Home</h1>
+        <img src="/images/logo-tas.png" alt="Logo TAS" id="logoTas" />
+        <h1 id="titulo">Sistema Domótico TAS<em class="exponente">®</em></h1>
 
-        <div class="container">
+        <div class="container top">
             <h3>Medidas Actuales</h3>
 
             <p class="medidasBox">Temperatura: <span id="temperaturaMedida"></span> Cº</p>
 
             <p class="medidasBox">Luminosidad: <span id="luminosidadMedida"></span> cd</p>
+
+            <p class="medidasBox">Viento: <span id="windMedido"></span> km/h</p>
         </div>
         <br>
         <div class="container" style="height: 350px;">
@@ -26,22 +30,28 @@
             <div class="image123">
                 <figure class="imgContainer">
                     <img src="/images/aire.jpg" height="200" width="200"/>
-                    <figcaption><button id="btnAireOn/Off" onclick="actuarAire()"></button><button id="btnAireFrio/Calor" onclick="actuarModoAire()"></button></figcaption>
+                    <figcaption><button id="btnAireOn/Off" onclick="actuarAire()"></button><button id="btnAireFrio/Calor" onclick="actuarModoAire()"></button><span onclick="controlAire()" class="material-icons btnControl" id="ctrlA">check_circle</span></figcaption>
                 </figure>
                 <figure class="imgContainer">
                     <img id="imgPersiana" height="200" width="200"/>
-                    <figcaption><button id="btnPersiana" onclick="actuarPersiana()"></button></figcaption>
+                    <figcaption><button id="btnPersiana" onclick="actuarPersiana()"></button><span onclick="controlPersiana()" class="material-icons btnControl" id="ctrlP">check_circle</span></figcaption>
+                </figure>
+                <figure class="imgContainer">
+                    <img id="imgToldo" height="200" width="300"/>
+                    <figcaption><button id="btnToldo" onclick="actuarToldo()"></button><span onclick="controlToldo()" class="material-icons btnControl" id="ctrlT">check_circle</span></figcaption>
                 </figure>
             </div>
         </div>
         <br>
-        <div class="container">
+        <div class="container alertas">
             <h3>Alertas</h3>
-            <p id="alertaTemp"></p>
-            <p id="alertaLuz"></p>
-            <p id="alertaAire"></p>
-            <p id="alertaPersiana"></p>
-            <p id="alertaDesconexion"></p>
+            <p class="alerta" id="alertaTemp"></p>
+            <p class="alerta" id="alertaAire"></p>
+            <p class="alerta" id="alertaLuz"></p>
+            <p class="alerta" id="alertaPersiana"></p>
+            <p class="alerta" id="alertaWind"></p>
+            <p class="alerta" id="alertaToldo"></p>
+            <p class="alerta" id="alertaDesconexion"></p>
         </div>
         <br>
         <a class="btn" href="/html/sensores.html" target="_blank">Acceso a los Sensores</a>
@@ -51,12 +61,14 @@
 	<script type="text/javascript">
         var temperatura = document.getElementById("temperaturaMedida");
         var luminosidad = document.getElementById("luminosidadMedida");
+        var wind = document.getElementById("windMedido");
 
         var socket = io.connect("localhost:8080");
 
         socket.on("nuevasMedidas", function(datos){
             temperatura.innerHTML = datos.temp;
             luminosidad.innerHTML = datos.luz;
+            wind.innerHTML = datos.wind;
             var alerta = document.getElementById("alertaDesconexion");
             alerta.innerHTML = "";
         });
@@ -117,24 +129,122 @@
             }
         });
 
+        socket.on("cambiarToldo", function(data){
+            var img = document.getElementById("imgToldo");
+            var btn = document.getElementById("btnToldo");
+
+            if(data.estado == "Cerrado"){
+                img.setAttribute("src","/images/toldoCerrado.png");
+                btn.innerHTML = "Echar Toldo";
+            }
+            else{
+                img.setAttribute("src","/images/toldoAbierto.png");
+                btn.innerHTML = "Recoger Toldo";
+            }
+        });
+
         socket.on("alertaTemp", function(data){
-            document.getElementById("alertaTemp").innerHTML = data.msg;
+            var alerta = document.getElementById("alertaTemp");
+            alerta.innerHTML = data.msg;
+            if(data.msg == ""){
+                alerta.style.display = "none";
+            }
+            else{
+                alerta.style.display = "block";
+            }
         });
 
         socket.on("alertaLuz", function(data){
-            document.getElementById("alertaLuz").innerHTML = data.msg;
+            var alerta = document.getElementById("alertaLuz");
+            alerta.innerHTML = data.msg;
+            if(data.msg == ""){
+                alerta.style.display = "none";
+            }
+            else{
+                alerta.style.display = "block";
+            }
         });
 
+        socket.on("alertaWind", function(data){
+            var alerta = document.getElementById("alertaWind");
+            alerta.innerHTML = data.msg;
+            if(data.msg == ""){
+                alerta.style.display = "none";
+            }
+            else{
+                alerta.style.display = "block";
+            }
+        })
+
         socket.on("alertaPersiana", function(data){
-            document.getElementById("alertaPersiana").innerHTML = data.msg;
+            var alerta = document.getElementById("alertaPersiana");
+            alerta.innerHTML = data.msg;
+            if(data.msg == ""){
+                alerta.style.display = "none";
+            }
+            else{
+                alerta.style.display = "block";
+            }
         });
 
         socket.on("alertaAire", function(data){
-            document.getElementById("alertaAire").innerHTML = data.msg;
+            var alerta = document.getElementById("alertaAire");
+            alerta.innerHTML = data.msg;
+            if(data.msg == ""){
+                alerta.style.display = "none";
+            }
+            else{
+                alerta.style.display = "block";
+            }
+        });
+
+        socket.on("alertaToldo", function(data){
+            var alerta = document.getElementById("alertaToldo");
+            alerta.innerHTML = data.msg;
+            if(data.msg == ""){
+                alerta.style.display = "none";
+            }
+            else{
+                alerta.style.display = "block";
+            }
+        });
+
+        socket.on("cambiarCtrlAire", function(data){
+            var btn = document.getElementById("ctrlA");
+            if(data.activo == "ON"){
+                btn.style.color = "#2ad32a";
+            }
+            else{
+                btn.style.color = "#bd1f1f";
+            }
+        });
+
+        socket.on("cambiarCtrlPersiana", function(data){
+            var btn = document.getElementById("ctrlP");
+            if(data.activo == "ON"){
+                btn.style.color = "#2ad32a";
+            }
+            else{
+                btn.style.color = "#bd1f1f";
+            }
+        });
+
+        socket.on("cambiarCtrlToldo", function(data){
+            var btn = document.getElementById("ctrlT");
+            if(data.activo == "ON"){
+                btn.style.color = "#2ad32a";
+            }
+            else{
+                btn.style.color = "#bd1f1f";
+            }
         });
 
         function actuarPersiana(){
             socket.emit("actuarPersiana");
+        }
+
+        function controlPersiana(){
+            socket.emit("controlPersiana");
         }
 
         function actuarAire(){
@@ -143,6 +253,18 @@
 
         function actuarModoAire(){
             socket.emit("actuarModoAire");
+        }
+
+        function controlAire(){
+            socket.emit("controlAire");
+        }
+
+        function actuarToldo(){
+            socket.emit("actuarToldo");
+        }
+
+        function controlToldo(){
+            socket.emit("controlToldo");
         }
     </script>
 </html>
