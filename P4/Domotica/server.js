@@ -57,9 +57,13 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
     dbo.collection("timestamps", function(err,collection){
         console.log("Servicio MongoDB Iniciado");
 
+        //Cuando se conecta, el servidor proporciona la última información recibida de los sensores, que extrae de la BD
+        //Esto permite que tras una caida y recuperación del servidor, este no provea los valores por defecto si dispone de histórico
         collection.find().sort({_id:-1}).limit(1).next(function(err,result){
-            luz = result.luz;
-            temp = result.temp;
+            if(result != null){
+                luz = result.luz;
+                temp = result.temp;
+            }
         });
 
         io.sockets.on('connection', function(client){
