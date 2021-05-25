@@ -6,6 +6,7 @@ var socketio = require("socket.io");
 var mimeTypes = { "html": "text/html", "jpeg": "image/jpeg", "jpg": "image/jpeg", "png": "image/png", "js": "text/javascript", "css": "text/css", "swf": "application/x-shockwave-flash"};
 var MongoClient = require('mongodb').MongoClient;
 var nodeMailer = require('nodemailer');
+var weather = require('openweather-apis');
 
 var httpServer = http.createServer(
     function(request,response){
@@ -73,6 +74,12 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
             }
         });
 
+        weather.setAPPID("88186d03abe56a91971d904ca4bebb18");
+        weather.setLang('en');
+        weather.setUnits('metric');
+        weather.setCityId("2517117");
+
+
         io.sockets.on('connection', function(client){
             io.sockets.emit("nuevasMedidas", {temp : temp, luz : luz, wind : wind});
             io.sockets.emit("cambiarPersiana", {estado:persiana});
@@ -81,6 +88,10 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
             io.sockets.emit("cambiarCtrlAire", {activo:ctrlA});
             io.sockets.emit("cambiarCtrlPersiana", {activo:ctrlP});
             io.sockets.emit("cambiarCtrlToldo", {activo:ctrlT});
+            weather.getAllWeather(function(err, forecast){
+                io.sockets.emit("weather",{icon:forecast.weather[0].icon});
+            })
+            
 
             client.on("sendMedidas", function(data){
                 luz = data.luz;
