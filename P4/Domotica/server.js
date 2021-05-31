@@ -7,6 +7,7 @@ var mimeTypes = { "html": "text/html", "jpeg": "image/jpeg", "jpg": "image/jpeg"
 var MongoClient = require('mongodb').MongoClient;
 var nodeMailer = require('nodemailer');
 
+//Inicio del servidor web
 var httpServer = http.createServer(
     function(request,response){
         var uri = url.parse(request.url).pathname;
@@ -52,6 +53,7 @@ var luz = 50;
 var temp = 25;
 var wind = 30;
 
+//Acceso a la BD Mongo
 MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnifiedTopology:true}, function(err, db){
     httpServer.listen(8080);
     console.log("Servidor Web Iniciado");
@@ -73,7 +75,9 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
             }
         });
 
+        //Cuando se conecta un cliente
         io.sockets.on('connection', function(client){
+            //Se envían las medidas actuales para que su vista sea consistente con el resto
             io.sockets.emit("nuevasMedidas", {temp : temp, luz : luz, wind : wind});
             io.sockets.emit("cambiarPersiana", {estado:persiana});
             io.sockets.emit("powerAire", {estado:aire,modo:modoAire});
@@ -82,6 +86,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
             io.sockets.emit("cambiarCtrlPersiana", {activo:ctrlP});
             io.sockets.emit("cambiarCtrlToldo", {activo:ctrlT});
 
+            //Cuando el servidor recibe el el evento de los sensores, registra las medidas en la BD y las reenvía
             client.on("sendMedidas", function(data){
                 luz = data.luz;
                 temp = data.temp;
@@ -90,6 +95,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("nuevasMedidas", {temp:data.temp,luz:data.luz,wind:data.wind});
             });
 
+            //Cuando se cambia la persiana se actualiza su estado y se notifica
             client.on("actuarPersiana", function(){
                 if(persiana == "Down"){
                     persiana = "Up";
@@ -101,6 +107,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("cambiarPersiana", {estado:persiana});
             });
 
+            //Cuando se actualiza el control automático de la persiana se hace lo mismo
             client.on("controlPersiana", function(){
                 if(ctrlP == "ON"){
                     ctrlP = "OFF";
@@ -112,6 +119,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("cambiarCtrlPersiana", {activo:ctrlP, luz:luz, temp:temp});
             });
 
+            //Se cambia el aire
             client.on("actuarAire", function(){
                 if(aire == "OFF"){
                     aire = "ON";
@@ -123,6 +131,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("powerAire", {estado:aire,modo:modoAire});
             });
 
+            //Se cambia el modo del aire (frio o calor)
             client.on("actuarModoAire", function(){
                 if(modoAire == "Frio"){
                     modoAire = "Calor";
@@ -134,6 +143,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("modoAire", {modo:modoAire});
             });
 
+            //Se cambia el control automático del aire
             client.on("controlAire", function(){
                 if(ctrlA == "ON"){
                     ctrlA = "OFF";
@@ -145,6 +155,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("cambiarCtrlAire", {activo:ctrlA, temp:temp});
             });
 
+            //Se cambia el toldo
             client.on("actuarToldo", function(){
                 if(toldo == "Cerrado"){
                     toldo = "Abierto";
@@ -155,36 +166,9 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
 
                 io.sockets.emit("cambiarToldo", {estado:toldo});
 
-                //Envio del correo
-                dbo.collection("gmail", function(err,collection){
-                    collection.findOne(function(err,result){
-                        if(result != null){
-                            var transporter = nodeMailer.createTransport({
-                                service: collection.collectionName,
-                                auth: {
-                                    user: result.user,
-                                    pass: result.pass
-                                }
-                            });
-                            
-                            var mailOptions = {
-                                from: result.user,
-                                to: result.user,
-                                subject: 'TAS: Toldos Defender',
-                                text: 'Este correo es un aviso de que tu sistema TAS: Toldos Defender funciona correctamente y, de hecho, ¡Acaba de salvar a tu toldo de una desgracia!. Gracias por confiar en nosotros y estate tranquilo, tu toldo está protegido.'
-                            };
-            
-                            transporter.sendMail(mailOptions,function(error,info) {
-                                if(error){
-                                    console.log(error);
-                                }
-                            });
-                        }
-                    });
-                });
-
             });  
 
+            //Se cambia el control automático del toldo
             client.on("controlToldo", function(){
                 if(ctrlT == "ON"){
                     ctrlT = "OFF";
@@ -196,18 +180,22 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 io.sockets.emit("cambiarCtrlToldo", {activo:ctrlT, wind:wind});
             });
 
+            //Alerta de temperatura
             client.on("agenteTemp", function(data){
                 io.sockets.emit("alertaTemp",data);
             });
 
+            //Alerta de luz
             client.on("agenteLuz", function(data){
                 io.sockets.emit("alertaLuz",data);
             });
 
+            //Alerta de viento
             client.on("agenteWind", function(data){
                 io.sockets.emit("alertaWind",data);
             });
 
+            //Control automático de la persiana
             client.on("agentePersiana", function(data){
                 if(data.act == 1){
                     persiana = "Down";
@@ -219,6 +207,7 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 }
             });
 
+            //Control automático del aire
             client.on("agenteAire", function(data){
                 if(data.act == 1){
                     aire = "ON";
@@ -231,11 +220,39 @@ MongoClient.connect("mongodb://localhost:27017/", {useNewUrlParser:true, useUnif
                 }
             });
 
+            //Control automático del toldo, con envío de correo
             client.on("agenteToldo", function(data){
                 if(data.act == 1){
                     toldo = "Cerrado";
                     io.sockets.emit("cambiarToldo",{estado:toldo});
                     io.sockets.emit("alertaToldo", {msg:data.msg});
+                    //Envio del correo
+                    dbo.collection("gmail", function(err,collection){
+                        collection.findOne(function(err,result){
+                            if(result != null){
+                                var transporter = nodeMailer.createTransport({
+                                    service: collection.collectionName,
+                                    auth: {
+                                        user: result.user,
+                                        pass: result.pass
+                                    }
+                                });
+                                
+                                var mailOptions = {
+                                    from: result.user,
+                                    to: result.user,
+                                    subject: 'TAS: Toldos Defender',
+                                    text: 'Este correo es un aviso de que tu sistema TAS: Toldos Defender funciona correctamente y, de hecho, ¡Acaba de salvar a tu toldo de una desgracia!. Gracias por confiar en nosotros y estate tranquilo, tu toldo está protegido.'
+                                };
+                
+                                transporter.sendMail(mailOptions,function(error,info) {
+                                    if(error){
+                                        console.log(error);
+                                    }
+                                });
+                            }
+                        });
+                    });
                 }
                 else{
                     io.sockets.emit("alertaToldo", {msg:data.msg});

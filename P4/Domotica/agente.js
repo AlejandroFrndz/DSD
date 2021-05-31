@@ -14,6 +14,7 @@ var ctrlA = "ON";
 var ctrlP = "ON";
 var ctrlT = "ON";
 
+//Cuando se reciben medidas de los sensores, se comprueban los valores y se decide si se debe actuar o emitir alguna alerta
 socket.on("nuevasMedidas", function(data){
     var alertT = false;
     var alertL = false;
@@ -46,6 +47,7 @@ socket.on("nuevasMedidas", function(data){
         socket.emit("agenteWind", {msg:"Aviso: Rachas fuertes de viento en el exterior"});
     }
 
+    //La actuación automática solo se realiza si está activa
     if(ctrlP == "ON"){
         checkPersiana(data);
     }
@@ -58,6 +60,7 @@ socket.on("nuevasMedidas", function(data){
         checkAire(data);
     }
 
+    //Si no se ha registrado ninguna alerta se limpia el mensaje
     if(!alertT){
         socket.emit("agenteTemp",{msg:""});
     }
@@ -69,6 +72,7 @@ socket.on("nuevasMedidas", function(data){
     }
 });
 
+//Se registra el cambio del control automático
 socket.on("cambiarCtrlAire", function(data){
     ctrlA = data.activo;
 
@@ -93,6 +97,7 @@ socket.on("cambiarCtrlToldo", function(data){
     }
 });
 
+//Función de comprobación para actuar automáticamente
 function checkAire(data){
     if(data.temp >= tempMaxCrit){
         socket.emit("agenteAire", {act:1,modo:"Frio",msg:"Aviso:Se ha encendido el aire automáticamente"});

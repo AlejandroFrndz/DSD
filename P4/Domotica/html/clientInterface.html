@@ -85,17 +85,21 @@
 
         var socket = io.connect("localhost:8080");
 
+        //Cuando se reciben nuevas medidas se actualiza la interfaz
         socket.on("nuevasMedidas", function(datos){
             temperatura.innerHTML = datos.temp;
             luminosidad.innerHTML = datos.luz;
             wind.innerHTML = datos.wind;
+            //También se oculta la alerta de desconexión
             document.getElementById("alertaDesconexion").style.display = "none";
         });
 
+        //Cuando se pierde la conexión con el servidor se notifica
         socket.on("disconnect", function(){
             document.getElementById("alertaDesconexion").style.display = "block";
         });
 
+        //Se actualiza la interfaz de la persiana
         socket.on("cambiarPersiana", function(data){
             var img = document.getElementById("imgPersiana");
             var btn = document.getElementById("btnPersiana");
@@ -110,6 +114,7 @@
             }
         });
 
+        //Se actualiza la interfaz del aire, encendiendolo
         socket.on("powerAire", function(data){
             var btnPower = document.getElementById("btnAireOn/Off");
             var btnModo = document.getElementById("btnAireFrio/Calor");
@@ -135,6 +140,7 @@
             }
         });
 
+        //Se actualiza la intefaz del aire, actualizando su modo de funcionamiento
         socket.on("modoAire", function(data){
             var btnModo = document.getElementById("btnAireFrio/Calor");
             if(data.modo == "Frio"){
@@ -147,6 +153,7 @@
             }
         });
 
+        //Se actualiza la interfaz del toldo
         socket.on("cambiarToldo", function(data){
             var img = document.getElementById("imgToldo");
             var btn = document.getElementById("btnToldo");
@@ -161,6 +168,7 @@
             }
         });
 
+        //Gestión de las alertas
         socket.on("alertaTemp", function(data){
             var alerta = document.getElementById("alertaTemp");
             alerta.innerHTML = data.msg;
@@ -227,6 +235,7 @@
             }
         });
 
+        //Cambios del control automático de los actuadores
         socket.on("cambiarCtrlAire", function(data){
             var btn = document.getElementById("ctrlA");
             if(data.activo == "ON"){
@@ -257,6 +266,7 @@
             }
         });
 
+        //Manejadores de los botones de la interfaz
         function actuarPersiana(){
             socket.emit("actuarPersiana");
         }
@@ -285,6 +295,7 @@
             socket.emit("controlToldo");
         }
 
+        //Creación del widget del tiempo
         function reloadWidget(opt){
             var widget = document.getElementById("widget");
             var href, label;
@@ -311,10 +322,6 @@
                         fjs.parentNode.insertBefore(js,fjs);
                 }(document,'script','weatherwidget-io-js');
             }
-        }
-
-        function doSomething(obj){
-            console.log(obj);
         }
     </script>
 </html>
